@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "wire-harness-color-sequence-detector"
+version = "0.1.0"
+description = ""
+authors = ["Pattarapon Kittisrisawai <pattarapon.kitti@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7,<3.11"
+numpy = "1.21.4"
+opencv-python = "4.5.5.62"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+isort = "^5.10.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
