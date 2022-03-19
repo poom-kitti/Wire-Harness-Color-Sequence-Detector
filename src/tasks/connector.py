@@ -45,18 +45,13 @@ def fill_wire_connector_holes(thresh_img: np.ndarray) -> np.ndarray:
     return cv2.morphologyEx(thresh_img, cv2.MORPH_CLOSE, kernel, iterations=iterations)
 
 
-def find_connector_contour(thresh_img: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def find_connector_contour(frame_thresh: np.ndarray) -> np.ndarray:
     """Find the wire connector contour. This function assumes that
     the connector is the largest contour found in the `thresh_img`.
 
     This is the main function used to find the connector contour.
-
-    Returns:
-        - connector_contour: The contour of the wire connector.
-        - connector_thresh: The threshold image containing only the
-            wire connector.
     """
-    connector_thresh = remove_wires_from_treshold(thresh_img)
+    connector_thresh = remove_wires_from_treshold(frame_thresh)
     connector_thresh = fill_wire_connector_holes(connector_thresh)
 
     # Find contours
@@ -67,4 +62,4 @@ def find_connector_contour(thresh_img: np.ndarray) -> Tuple[np.ndarray, np.ndarr
     # Should only have one contour (connector), but find max for safety
     connector_contour = max(contours, key=cv2.contourArea)
 
-    return connector_contour, connector_thresh
+    return connector_contour
