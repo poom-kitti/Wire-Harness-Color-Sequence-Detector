@@ -3,9 +3,7 @@ import cv2
 import numpy as np
 
 
-def filter_out_small_contours(
-    thresh_img: np.ndarray, min_contour_area: float
-) -> np.ndarray:
+def filter_out_small_contours(thresh_img: np.ndarray, min_contour_area: float) -> np.ndarray:
     """Filter out contours that are less than the `min_contour_area` by filling the `thresh_img`
     as black where the contours are found.
 
@@ -15,9 +13,7 @@ def filter_out_small_contours(
     thresh_img = thresh_img.copy()
 
     # Find the contours
-    contours, _ = cv2.findContours(
-        thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-    )
+    contours, _ = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # Filter out small contours
     contours_to_fill = []
@@ -31,9 +27,7 @@ def filter_out_small_contours(
     return thresh_img
 
 
-def filter_for_largest_contour(
-    thresh_img: np.ndarray, min_contour_area: float
-) -> np.ndarray:
+def filter_for_largest_contour(thresh_img: np.ndarray, min_contour_area: float) -> np.ndarray:
     """Filter for the largest contour in `thresh_img`. Any contour that is not the largest
     contour will be filled as black.
 
@@ -46,9 +40,7 @@ def filter_for_largest_contour(
     black_img = np.zeros(thresh_img.shape, np.uint8)
 
     # Find the contours
-    contours, _ = cv2.findContours(
-        thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-    )
+    contours, _ = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # Get the max contour
     max_contour = max(contours, key=cv2.contourArea)

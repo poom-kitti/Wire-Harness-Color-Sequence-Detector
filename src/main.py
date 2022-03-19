@@ -1,9 +1,10 @@
 import cv2
 import numpy as np
 
-from .tasks import connector, preprocess
+from .tasks import connector, preprocess, wire_roi
 
 DO_THRESHOLD_WITH_BG_IMG = True
+IS_HEIGHT_GREATER_THAN_WIDTH = True
 
 
 def main():
@@ -17,25 +18,25 @@ def main():
     bg_img = cv2.GaussianBlur(bg_img, (5, 5), 0)
     bg_img_hsv = cv2.cvtColor(bg_img, cv2.COLOR_BGR2HSV)
 
-    # Display image
-    display_img = frame.copy()
-
     # Perform thresholding
     if DO_THRESHOLD_WITH_BG_IMG:
-        threshold_img = preprocess.threshold_with_inRange(frame_hsv, bg_img_hsv)
+        frame_threshold = preprocess.threshold_with_inRange(frame_hsv, bg_img_hsv)
     else:
-        threshold_img = preprocess.threshold_with_otsu(frame_blur)
+        frame_threshold = preprocess.threshold_with_otsu(frame_blur)
 
     # Fill bg as white
-    frame_white_bg = preprocess.fill_bg_as_white(frame_blur, threshold_img)
+    frame_white_bg = preprocess.fill_bg_as_white(frame_blur, frame_threshold)
 
     # Find connector contour
-    connector_contour, connector_tresh = connector.find_connector_contour(threshold_img)
+    connector_contour = connector.find_connector_contour(frame_threshold)
 
-    cv2.drawContours(display_img, [connector_contour], -1, (255, 0, 0), 5)
+    wire_roi_img, display_img = wire_roi.find_wire_roi(
+        frame, frame_white_bg, connector_contour, IS_HEIGHT_GREATER_THAN_WIDTH
+    )
 
-    cv2.imshow("tresh", threshold_img)
-    cv2.imshow("connector", display_img)
+    cv2.imshow("frame", frame)
+    cv2.imshow("wire_roi", wire_roi_img)
+    cv2.imshow("display", display_img)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()

@@ -6,9 +6,7 @@ import cv2
 import numpy as np
 
 
-def get_straigten_rotation_angle(
-    min_area_rect: Tuple, is_height_longer_than_width: bool
-) -> float:
+def get_straigten_rotation_angle(min_area_rect: Tuple, is_height_longer_than_width: bool) -> float:
     """Get the rotation angle to rotate the image such that the rectangle defined by
     `min_area_rect` will be straigthen.
 
@@ -52,22 +50,14 @@ def get_straigten_rotation_angle(
     # Find whether rectangle is tilted left or right
     if is_height_longer_than_width:
         if is_most_btm_corner_on_left:
-            is_tilted_left = (
-                True if min_area_rect[1][0] > most_btm_corners_distance else False
-            )
+            is_tilted_left = True if min_area_rect[1][0] > most_btm_corners_distance else False
         else:
-            is_tilted_left = (
-                True if min_area_rect[1][1] < most_btm_corners_distance else False
-            )
+            is_tilted_left = True if min_area_rect[1][1] < most_btm_corners_distance else False
     else:
         if is_most_btm_corner_on_left:
-            is_tilted_left = (
-                True if min_area_rect[1][0] < most_btm_corners_distance else False
-            )
+            is_tilted_left = True if min_area_rect[1][0] < most_btm_corners_distance else False
         else:
-            is_tilted_left = (
-                True if min_area_rect[1][1] > most_btm_corners_distance else False
-            )
+            is_tilted_left = True if min_area_rect[1][1] > most_btm_corners_distance else False
 
     if is_tilted_left:
         return angle - 90
@@ -75,9 +65,7 @@ def get_straigten_rotation_angle(
         return angle
 
 
-def get_obj_actual_width_and_height(
-    min_area_rect: Tuple, is_height_longer_than_width: bool
-) -> Tuple[float, float]:
+def get_obj_actual_width_and_height(min_area_rect: Tuple, is_height_longer_than_width: bool) -> Tuple[float, float]:
     """Get the width and height of the object inside the `min_area_rect`.
 
     The width and height calculated from cv2.minAreaRect() is based on the bottom most corner, so

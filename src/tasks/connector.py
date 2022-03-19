@@ -19,9 +19,7 @@ def remove_wires_from_treshold(thresh_img: np.ndarray) -> np.ndarray:
     """
     # Set the kernel and iterations for morphological transformations
     kernel = np.ones((5, 5), np.uint8)
-    iterations = (
-        10  # Should be enough to erode the section where wires intersect connector
-    )
+    iterations = 10  # Should be enough to erode the section where wires intersect connector
 
     # Erode the thresh_img
     erode_thresh = cv2.erode(thresh_img, kernel, iterations=iterations)
@@ -55,9 +53,7 @@ def find_connector_contour(frame_thresh: np.ndarray) -> np.ndarray:
     connector_thresh = fill_wire_connector_holes(connector_thresh)
 
     # Find contours
-    contours, _ = cv2.findContours(
-        connector_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-    )
+    contours, _ = cv2.findContours(connector_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # Should only have one contour (connector), but find max for safety
     connector_contour = max(contours, key=cv2.contourArea)
