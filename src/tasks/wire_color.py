@@ -1,8 +1,10 @@
 """This module contains functions to find the wire HSV color."""
-from typing import Tuple
+from typing import List, Tuple
 
 import cv2
 import numpy as np
+from colormath import color_diff
+from colormath.color_objects import LabColor
 
 
 def find_wire_lab_color(wire_img: np.ndarray) -> Tuple[float, float, float]:
@@ -37,3 +39,49 @@ def find_wire_lab_color(wire_img: np.ndarray) -> Tuple[float, float, float]:
     representative_b_val = np.median(b_bin_vals)
 
     return representative_l_val, representative_a_val, representative_b_val
+
+
+def is_same_wire_color(
+    wire_1_lab: Tuple[float, float, float], wire_2_lab: Tuple[float, float, float], delta_e_threshold: float
+) -> bool:
+    """Checks whether the first wire has same color as the second wire.
+
+    This function assumes the colors of the wires are the same if the delta E 2000 between the two LAB colors
+    is below the given `delta_e_threshold`.
+    """
+    # Convert from opencv LAB to actual LAB color
+    # Reference: https://docs.opencv.org/4.5.5/de/d25/imgproc_color_conversions.html
+    wire_1_lab_color = LabColor(lab_l=wire_1_lab[0] * 100 / 255, lab_a=wire_1_lab[1] - 128, lab_b=wire_1_lab[2] - 128)
+    wire_2_lab_color = LabColor(lab_l=wire_2_lab[0] * 100 / 255, lab_a=wire_2_lab[1] - 128, lab_b=wire_2_lab[2] - 128)
+
+    # Calculate delta e
+    delta_e_2000 = color_diff.delta_e_cie2000(wire_1_lab_color, wire_2_lab_color)
+
+    # Check if delta e is less than threshold
+    return delta_e_2000 <= delta_e_threshold
+
+
+def is_same_color_sequence(
+    ref_wire_housing_colors: List[Tuple[float, float, float]],
+    target_wire_housing_colors: List[Tuple[float, float, float]],
+    acceptable_delta_e_threshold: float,
+) -> bool:
+    """Checks whether the color sequence found in `target_wire_housing_colors` is the same as the reference
+    `ref_wire_housing_colors`.
+
+    If the number of colors, the actual colors or sequence of colors is different, then the function will
+    return False.
+    """
+    # Checks if the number of colors are the same
+    if len(ref_wire_housing_colors) != len(target_wire_housing_colors):
+        return False
+
+    # Checks if each color in the sequence is the same
+    for i in range(len(ref_wire_housing_colors)):
+        if not is_same_wire_color(
+            ref_wire_housing_colors[i], target_wire_housing_colors[i], acceptable_delta_e_threshold
+        ):
+            return False
+
+    # Has same number of colors, and each color in sequence is the same
+    return True

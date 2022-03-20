@@ -9,7 +9,7 @@ IS_HEIGHT_GREATER_THAN_WIDTH = True
 
 def main():
     # Prepare frame
-    frame: np.ndarray = cv2.imread("asset/image1.jpg")
+    frame: np.ndarray = cv2.imread("asset/image2.jpg")
     frame_blur: np.ndarray = cv2.GaussianBlur(frame, (5, 5), 0)
 
     # Perform thresholding
