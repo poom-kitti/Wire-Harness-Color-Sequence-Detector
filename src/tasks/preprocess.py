@@ -34,7 +34,7 @@ def threshold_with_inRange(frame_hsv: np.ndarray, bg_img_hsv: np.ndarray) -> np.
 def threshold_with_otsu(frame: np.ndarray) -> np.ndarray:
     """Perform thresholing by using otsu thresholding.
 
-    The returned threshold image will have the background appears as black and the 
+    The returned threshold image will have the background appears as black and the
     wire harness appears as white.
     """
     # Convert frame to gray

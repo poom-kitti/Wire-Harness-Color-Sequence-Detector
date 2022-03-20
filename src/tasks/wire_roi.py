@@ -21,7 +21,7 @@ def get_roi_center(
     connector_height: float,
     roi_center_distance_from_connector_btm: int,
 ) -> Tuple[int, int]:
-    """Find the center of the wire region of interest based on the center 
+    """Find the center of the wire region of interest based on the center
     of connector min area rectangle and the given configurations of roi."""
     # Find bottom point of connector
     connector_center = connector_rect[0]
@@ -44,7 +44,7 @@ def get_display_image(
     wire_roi_center: Tuple[int, int],
     rotation_angle: float,
 ) -> np.ndarray:
-    """Get the image to display for the user highlighting the rectangles 
+    """Get the image to display for the user highlighting the rectangles
     surrounding the wire connector and wire region of interest."""
     # Create a mask of where the rectangles should be drawn
     # The white section of the mask will be filled with color
@@ -79,7 +79,7 @@ def get_display_image(
     display_img = original_frame.copy()
 
     # Fill the display image with red color based on where the mask is white (the rectangles)
-    display_img[mask == 255] = (114, 128, 250) # Red salmon color
+    display_img[mask == 255] = (114, 128, 250)  # Red salmon color
 
     return display_img
 
@@ -90,12 +90,12 @@ def find_wire_roi(
     connector_contour: np.ndarray,
     is_height_greater_than_width: bool,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Find the region of interest where the wires should reside. The ROI is 
+    """Find the region of interest where the wires should reside. The ROI is
     calculated as the area slightly below the wire connector.
 
     Returns:
         wire_roi: The region of interest holding the wires.
-        display_img: The display image to show the user highlighting the rectangles 
+        display_img: The display image to show the user highlighting the rectangles
             surrounding the wire connector and wire region of interest.
     """
     # Get the wire connector rotated rectangle and the connector size
