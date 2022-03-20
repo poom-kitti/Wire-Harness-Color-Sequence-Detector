@@ -1,4 +1,6 @@
 """This module contains utility functions that deal with contour and threshold image."""
+from typing import List
+
 import cv2
 import numpy as np
 
@@ -50,3 +52,33 @@ def filter_for_largest_contour(thresh_img: np.ndarray, min_contour_area: float) 
         cv2.drawContours(black_img, [max_contour], -1, 255, -1)
 
     return black_img
+
+
+def get_contour_center_x_position(contour: np.ndarray) -> float:
+    """Get the x position of the center of the given `contour`. A high value means the
+    contour center is positioned more towards the right side.
+    """
+    contour_rect = cv2.minAreaRect(contour)
+
+    return contour_rect[0][0]
+
+
+def get_contour_center_y_position(contour: np.ndarray) -> float:
+    """Get the y position of the center of the given `contour`. A high value means the
+    contour center is positioned more towards the bottom side.
+    """
+    contour_rect = cv2.minAreaRect(contour)
+
+    return contour_rect[0][1]
+
+
+def sort_contours_by_axis(contours: List[np.ndarray], by_x_axis: bool) -> List[np.ndarray]:
+    """Sort the `contours` given based on their centers according to a given axis.
+
+    If sort by x axis, the contours will be sorted from left to right.
+    If sort by y axis, the contours will be sorted from top to bottom.
+    """
+    if by_x_axis:
+        return sorted(contours, key=get_contour_center_x_position)
+
+    return sorted(contours, key=get_contour_center_y_position)
