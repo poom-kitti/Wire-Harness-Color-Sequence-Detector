@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from .tasks import connector, preprocess, wire_roi, wires
+from .tasks import connector, preprocess, wire_color, wire_roi, wires
 
 DO_THRESHOLD_WITH_BG_IMG = True
 IS_HEIGHT_GREATER_THAN_WIDTH = True
@@ -9,7 +9,7 @@ IS_HEIGHT_GREATER_THAN_WIDTH = True
 
 def main():
     # Prepare frame
-    frame: np.ndarray = cv2.imread("asset/image1.jpg")
+    frame: np.ndarray = cv2.imread("asset/image2.jpg")
     frame_blur: np.ndarray = cv2.GaussianBlur(frame, (5, 5), 0)
 
     # Perform thresholding
@@ -41,6 +41,7 @@ def main():
     cv2.imshow("wire_roi", wire_roi_img)
     cv2.imshow("display", display_img)
     for i, wire in enumerate(cropped_wires):
+        print(f"wire_{i} hsv:", wire_color.find_wire_hsv_color(wire))
         cv2.imshow(f"wire_{i}", wire)
 
     cv2.waitKey(0)
