@@ -8,6 +8,7 @@ authors = ["Pattarapon Kittisrisawai <pattarapon.kitti@gmail.com>"]
 python = "~3.7"
 numpy = "1.21.4"
 opencv-python = "4.5.5.62"
+colormath = "3.0.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
