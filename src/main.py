@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from .tasks import connector, preprocess, wire_roi
+from .tasks import connector, preprocess, wire_roi, wires
 
 DO_THRESHOLD_WITH_BG_IMG = True
 IS_HEIGHT_GREATER_THAN_WIDTH = True
@@ -11,15 +11,16 @@ def main():
     # Prepare frame
     frame: np.ndarray = cv2.imread("asset/image1.jpg")
     frame_blur: np.ndarray = cv2.GaussianBlur(frame, (5, 5), 0)
-    frame_hsv: np.ndarray = cv2.cvtColor(frame_blur, cv2.COLOR_BGR2HSV)
-
-    # Prepare img of background only
-    bg_img: np.ndarray = cv2.imread("asset/image-bg.jpg")
-    bg_img = cv2.GaussianBlur(bg_img, (5, 5), 0)
-    bg_img_hsv = cv2.cvtColor(bg_img, cv2.COLOR_BGR2HSV)
 
     # Perform thresholding
     if DO_THRESHOLD_WITH_BG_IMG:
+        # Prepare img of background only
+        bg_img: np.ndarray = cv2.imread("asset/image-bg.jpg")
+        bg_img = cv2.GaussianBlur(bg_img, (5, 5), 0)
+        bg_img_hsv = cv2.cvtColor(bg_img, cv2.COLOR_BGR2HSV)
+
+        frame_hsv: np.ndarray = cv2.cvtColor(frame_blur, cv2.COLOR_BGR2HSV)
+
         frame_threshold = preprocess.threshold_with_inRange(frame_hsv, bg_img_hsv)
     else:
         frame_threshold = preprocess.threshold_with_otsu(frame_blur)
@@ -34,9 +35,13 @@ def main():
         frame, frame_white_bg, connector_contour, IS_HEIGHT_GREATER_THAN_WIDTH
     )
 
+    cropped_wires = wires.find_wires(wire_roi_img)
+
     cv2.imshow("frame", frame)
     cv2.imshow("wire_roi", wire_roi_img)
     cv2.imshow("display", display_img)
+    for i, wire in enumerate(cropped_wires):
+        cv2.imshow(f"wire_{i}", wire)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
