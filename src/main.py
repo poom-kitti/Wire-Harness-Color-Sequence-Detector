@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from .tasks import connector, preprocess, wire_color, wire_roi, wires
+from .tasks import connector, display, preprocess, wire_color, wire_roi, wires
 
 DO_THRESHOLD_WITH_BG_IMG = True
 IS_HEIGHT_GREATER_THAN_WIDTH = True
@@ -37,12 +37,17 @@ def main():
 
     cropped_wires = wires.find_wires(wire_roi_img)
 
-    cv2.imshow("frame", frame)
-    cv2.imshow("wire_roi", wire_roi_img)
-    cv2.imshow("display", display_img)
     for i, wire in enumerate(cropped_wires):
         print(f"wire_{i} lab:", wire_color.find_wire_lab_color(wire))
         cv2.imshow(f"wire_{i}", wire)
+
+    display_img = display.draw_color_sequence_result(display_img, True)
+    display_img = display.draw_title_and_command(
+        display_img, "Color Sequence Checking", "[Q / ESC] Exit", "[R] Retake Reference Image", "[B] Back"
+    )
+
+    cv2.imshow("wire_roi", wire_roi_img)
+    cv2.imshow("display", display_img)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
