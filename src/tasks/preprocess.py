@@ -8,9 +8,9 @@ from ..utils import contour_utils
 
 def threshold_with_inRange(frame_hsv: np.ndarray, bg_img_hsv: np.ndarray) -> np.ndarray:
     """Perform thresholing by using cv2.inRange. Since the background is much brighter than
-    the wire harness, we will filter for the bright pixels and consider them as background.
+    the wire housing, we will filter for the bright pixels and consider them as background.
 
-    The returned threshold image will have the background appears as black and the wire harness
+    The returned threshold image will have the background appears as black and the wire housing
     appears as white.
 
     This method may work better than threshold_with_otsu() in certain circumstances, but is
@@ -35,7 +35,7 @@ def threshold_with_otsu(frame: np.ndarray) -> np.ndarray:
     """Perform thresholing by using otsu thresholding.
 
     The returned threshold image will have the background appears as black and the
-    wire harness appears as white.
+    wire housing appears as white.
     """
     # Convert frame to gray
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
