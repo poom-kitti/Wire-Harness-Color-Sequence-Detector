@@ -12,8 +12,8 @@ from ..utils import frame_utils, rect_utils
 @dataclass
 class WireRoiConfig:
     roi_width: int
-    roi_height: int
-    roi_center_distance_from_connector_btm: int
+    roi_height: int = 30
+    roi_center_distance_from_connector_btm: int = 25
 
 
 def get_roi_center(
@@ -111,8 +111,6 @@ def find_wire_roi(
     # Configure roi
     wire_roi_config = WireRoiConfig(
         roi_width=int(connector_width),
-        roi_height=30,
-        roi_center_distance_from_connector_btm=25,
     )
 
     # Find wire roi center

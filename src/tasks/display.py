@@ -12,7 +12,7 @@ def draw_color_sequence_result(display_img: np.ndarray, is_same_sequence: bool) 
     If the color sequence is the same, `OK` will be written.
     If the color sequence is different, `NG` will be written.
     """
-    # Config rectangle
+    # Configure rectangle location in frame
     start_point = (1100, 25)
     end_point = (1250, 125)
     color = (41, 92, 0) if is_same_sequence else (19, 25, 122)  # Green or same, else red
@@ -20,7 +20,7 @@ def draw_color_sequence_result(display_img: np.ndarray, is_same_sequence: bool) 
     # Draw rectangle
     display_img = cv2.rectangle(display_img, start_point, end_point, color, -1)
 
-    # Config text
+    # Configure text
     text = "OK" if is_same_sequence else "NG"
     text_point = (1110, 105)
 

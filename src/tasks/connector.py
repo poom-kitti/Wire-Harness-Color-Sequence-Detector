@@ -1,10 +1,10 @@
 """This module contains functions to find the wire connector."""
-from typing import Tuple
-
 import cv2
 import numpy as np
 
 from ..utils import contour_utils
+
+MINIMUM_VALID_CONNECTOR_AREA_AFTER_ERODE = 30000
 
 
 def remove_wires_from_treshold(thresh_img: np.ndarray) -> np.ndarray:
@@ -25,7 +25,7 @@ def remove_wires_from_treshold(thresh_img: np.ndarray) -> np.ndarray:
     erode_thresh = cv2.erode(thresh_img, kernel, iterations=iterations)
 
     # Filter for only wire connector (assume is largest contour)
-    connector_thresh = contour_utils.filter_for_largest_contour(erode_thresh, 10000)
+    connector_thresh = contour_utils.filter_for_largest_contour(erode_thresh, MINIMUM_VALID_CONNECTOR_AREA_AFTER_ERODE)
 
     # Dilate back to get connector shape
     return cv2.dilate(connector_thresh, kernel, iterations=iterations)
