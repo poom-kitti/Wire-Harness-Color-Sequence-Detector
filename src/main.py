@@ -25,6 +25,9 @@ def main():
     else:
         frame_threshold = preprocess.threshold_with_otsu(frame_blur)
 
+    check_section_img = preprocess.get_check_section_display(frame.copy())
+    print("Has wire connector candidate: ", preprocess.has_wire_connector_candidate(frame_threshold))
+
     # Fill bg as white
     frame_white_bg = preprocess.fill_bg_as_white(frame_blur, frame_threshold)
 
@@ -46,6 +49,7 @@ def main():
         display_img, "Color Sequence Checking", "[Q / ESC] Exit", "[R] Retake Reference Image", "[B] Back"
     )
 
+    cv2.imshow("check_section", check_section_img)
     cv2.imshow("wire_roi", wire_roi_img)
     cv2.imshow("display", display_img)
 
