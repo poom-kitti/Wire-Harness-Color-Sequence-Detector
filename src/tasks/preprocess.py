@@ -5,6 +5,8 @@ import numpy as np
 
 from ..utils import contour_utils
 
+DEFAULT_LOWEST_V_VALUE = 150  # Default lowest V value in HSV for being considered background
+MINIMUM_VALID_CONTOUR_AREA = 2000  # Minimum area to be considered a contour of an object
 
 def threshold_with_inRange(frame_hsv: np.ndarray, bg_img_hsv: np.ndarray) -> np.ndarray:
     """Perform thresholing by using cv2.inRange. Since the background is much brighter than
@@ -19,7 +21,7 @@ def threshold_with_inRange(frame_hsv: np.ndarray, bg_img_hsv: np.ndarray) -> np.
     """
     # Finding the lowest v value in bg_img_hsv
     lowest_v_value = int(np.min(bg_img_hsv[:, :, 2]))
-    lowest_v_value = max(150, lowest_v_value)
+    lowest_v_value = max(DEFAULT_LOWEST_V_VALUE, lowest_v_value)
 
     # Threshold by filtering with only v value
     thresh_img = cv2.inRange(frame_hsv, (0, 0, lowest_v_value), (180, 255, 255))
@@ -28,7 +30,7 @@ def threshold_with_inRange(frame_hsv: np.ndarray, bg_img_hsv: np.ndarray) -> np.
     thresh_img = cv2.bitwise_not(thresh_img)
 
     # Filter small contours
-    return contour_utils.filter_out_small_contours(thresh_img, 2000)
+    return contour_utils.filter_out_small_contours(thresh_img, MINIMUM_VALID_CONTOUR_AREA)
 
 
 def threshold_with_otsu(frame: np.ndarray) -> np.ndarray:
@@ -47,7 +49,7 @@ def threshold_with_otsu(frame: np.ndarray) -> np.ndarray:
     thresh_img = cv2.bitwise_not(thresh_img)
 
     # Filter small contours
-    return contour_utils.filter_out_small_contours(thresh_img, 2000)
+    return contour_utils.filter_out_small_contours(thresh_img, MINIMUM_VALID_CONTOUR_AREA)
 
 
 def fill_bg_as_white(frame: np.ndarray, threshold_img: np.ndarray) -> np.ndarray:

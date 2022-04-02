@@ -6,6 +6,7 @@ import numpy as np
 from colormath import color_diff
 from colormath.color_objects import LabColor
 
+DEFAULT_ACCEPTABLE_DELTA_E_THRESHOLD = 3 # Default threshold to consider two colors equal
 
 def find_wire_lab_color(wire_img: np.ndarray) -> Tuple[float, float, float]:
     """Find the representative LAB value for the wire color.
