@@ -1,6 +1,8 @@
 """This module contains a class for picamera video stream."""
+import queue
 import time
 from dataclasses import dataclass
+from queue import Queue
 from threading import Thread
 from typing import Iterator, Tuple
 
@@ -23,11 +25,9 @@ class PiCameraStream:
         raw_capture: The raw captured PiRGBArray by the camera.
         capture_stream: An iterator that continuously capture new frames.
         is_running: A flag whether the current camera stream is running.
-        frame: The most recent frame captured (in BGR format).
     """
 
     is_running: bool
-    frame: ndarray
 
     def __init__(self, camera_config: PiCameraConfig):
         self.camera = self.__set_up_camera(camera_config)
@@ -35,6 +35,8 @@ class PiCameraStream:
         self.capture_stream: Iterator[PiRGBArray] = self.camera.capture_continuous(
             self.raw_capture, "bgr", use_video_port=True
         )
+
+        self.__frame_queue: Queue[ndarray] = queue.Queue(maxsize=1)
 
     def __set_up_camera(self, camera_config: PiCameraConfig) -> PiCamera:
         """Set up the Picamera configurations."""
@@ -61,7 +63,14 @@ class PiCameraStream:
         """Replace the current frame with the new frame read by the
         capture stream."""
         for frame in self.capture_stream:
-            self.frame = frame.array
+            # Remove unread frame from queue
+            try:
+                self.__frame_queue.get_nowait()
+            except queue.Empty:
+                pass
+            finally:
+                # Add frame to queue
+                self.__frame_queue.put(frame.array)
 
             self.raw_capture.truncate(0)
 
@@ -78,4 +87,4 @@ class PiCameraStream:
         if not self.is_running:
             raise AttributeError("Camera stream has not started yet.")
 
-        return self.frame
+        return self.__frame_queue.get()
