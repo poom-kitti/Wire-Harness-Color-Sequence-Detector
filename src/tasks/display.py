@@ -11,6 +11,12 @@ TEXT_BLACK_COLOR = (20, 20, 20)
 def get_text_only_frame(frame_size: Tuple[int, int], text: str) -> np.ndarray:
     """Get a frame with white background and text written.
 
+    The text will appear in multiple lines if it is longer than the number
+    characters a single line can hold. To manually move to new line, use `"\\n"`.
+
+    Example:
+    text = "This is a line. \\n This is another line."
+
     Args:
         frame_size: Size of the frame given in `(width, height)`.
         text: Text to be written on the frame.
@@ -28,7 +34,7 @@ def get_text_only_frame(frame_size: Tuple[int, int], text: str) -> np.ndarray:
 
     for word in words:
         # Write line if length is sufficient
-        if line_char_length + len(word) > characters_per_line:
+        if line_char_length + len(word) > characters_per_line or word == "\\n":
             line_text = " ".join(line_words)
             text_frame = cv2.putText(
                 text_frame, line_text, (10, text_y_position), cv2.FONT_HERSHEY_SIMPLEX, 1.5, TEXT_BLACK_COLOR, 2
@@ -37,6 +43,9 @@ def get_text_only_frame(frame_size: Tuple[int, int], text: str) -> np.ndarray:
             line_words = []
             line_char_length = 0
             text_y_position += 60
+
+        if word == "\\n":
+            continue
 
         line_words.append(word)
         line_char_length += len(word) + 1  # Additional char for space
