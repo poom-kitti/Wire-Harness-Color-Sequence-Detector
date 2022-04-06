@@ -1,0 +1,5 @@
+colormath==3.0.0
+networkx==2.6.3
+numpy==1.21.4
+opencv-python==4.5.5.62
+picamera[array]==1.13
