@@ -11,6 +11,8 @@ camera_config = PiCameraConfig(
     iso=800,
     exposure_mode="off",
     awb_mode="off",
+    hflip=True,
+    vflip=True
 )
 
 

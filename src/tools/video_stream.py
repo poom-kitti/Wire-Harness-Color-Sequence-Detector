@@ -18,6 +18,8 @@ class PiCameraConfig:
     iso: int
     exposure_mode: str
     awb_mode: str
+    hflip: bool
+    vflip: bool
 
 
 class PiCameraStream:
@@ -47,6 +49,8 @@ class PiCameraStream:
         camera.framerate_range = camera_config.framerate_range
         camera.resolution = camera_config.resolution
         camera.iso = camera_config.iso
+        camera.hflip = camera_config.hflip
+        camera.vflip = camera_config.vflip
 
         # Allow camera to warm up
         time.sleep(2)
