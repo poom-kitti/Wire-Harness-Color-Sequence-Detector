@@ -6,13 +6,13 @@ from .stages.initialize_stage import InitializeStage, InitializeStageConfig
 from .tools.video_stream import PiCameraConfig, PiCameraStream
 
 camera_config = PiCameraConfig(
-    framerate_range=(Fraction(20, 1), Fraction(60, 1)),
+    framerate_range=(Fraction(10, 1), Fraction(30, 1)),
     resolution=(1280, 720),
     iso=800,
     exposure_mode="off",
     awb_mode="off",
     hflip=True,
-    vflip=True
+    vflip=True,
 )
 
 

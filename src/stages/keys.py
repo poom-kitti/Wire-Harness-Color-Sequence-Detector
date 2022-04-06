@@ -1,5 +1,5 @@
 """This module contains the acceptable keys for each stage."""
-DEFAULT_WAIT_KEY_TIME = int(1000 / 120)  # ms
+DEFAULT_WAIT_KEY_TIME = int(1000 / 200)  # ms
 
 N_KEY = ord("n")
 R_KEY = ord("r")

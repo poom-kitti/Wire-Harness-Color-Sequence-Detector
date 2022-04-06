@@ -95,7 +95,7 @@ class ReferenceCaptureStage(Stage):
                     frame, frame_white_bg, connector_contour, self._user_config.is_connector_height_greater_than_width
                 )
 
-                cropped_wires = wires.find_wires(wire_roi_img)
+                cropped_wires = wires.find_wires(wire_roi_img, do_display_wires_thresh=True)
 
                 reference_color_sequence = [wire_color.find_wire_lab_color(wire) for wire in cropped_wires]
 
@@ -125,13 +125,16 @@ class ReferenceCaptureStage(Stage):
         if input_key in QUIT_KEYS:
             self.quit()
 
-        if input == Y_KEY:
+        if input_key == Y_KEY:
             return True
 
         return False
 
     def __run_check_capture_stage(self, reference_color_sequence: List[Tuple]) -> None:
         """Run the next stage, which is background capture stage."""
+        # Destroy the window showing the wires threshold of found wire housing
+        cv2.destroyWindow(wires.DISPLAY_WIRES_WINDOW_NAME)
+
         check_capture_stage = CheckCaptureStage()
         check_capture_stage_config = CheckCaptureStageConfig(self._camera, self._bg_img, reference_color_sequence)
 

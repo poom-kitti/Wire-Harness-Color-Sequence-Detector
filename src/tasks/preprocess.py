@@ -8,13 +8,14 @@ import numpy as np
 from ..utils import contour_utils
 
 DEFAULT_LOWEST_V_VALUE = 150  # Default lowest V value in HSV for being considered background
+DEFAULT_HIGHEST_BINARY_THRESHOLD = 150  # Default binary threshold for separating fg and bg
 MINIMUM_VALID_CONTOUR_AREA = 2000  # Minimum area to be considered a contour of an object
 
 # Proportion of frame to disregard when searching if wire connector candidate is present
 DISREGARD_WIDTH_PERCENTAGE = 0.3
-DISREGARD_HEIGHT_PERCENTAGE = 0.3
+DISREGARD_HEIGHT_PERCENTAGE = 0.5
 # Minimum area of contour to consider as possible candidate for wire connector
-MINIMUM_VALID_CONNECTOR_AREA = 50000
+MINIMUM_VALID_CONNECTOR_AREA = 20000
 
 
 @dataclass
@@ -63,8 +64,10 @@ def threshold_with_otsu(frame: np.ndarray) -> np.ndarray:
     # Convert frame to gray
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Apply otsu thresholding, ignore otsu threshold calculated
-    _, thresh_img = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # Apply otsu thresholding
+    otsu_threshold, thresh_img = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU)
+    threshold = min(DEFAULT_HIGHEST_BINARY_THRESHOLD, otsu_threshold)  # Above default threshold is bg
+    _, thresh_img = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)
 
     # Swap the color such that bg appears black and fg appears white
     thresh_img = cv2.bitwise_not(thresh_img)

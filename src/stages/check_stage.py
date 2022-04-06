@@ -7,9 +7,11 @@ from typing import List, Optional, Tuple
 import cv2
 import numpy as np
 
+import src.stages.initialize_stage as initialize
+import src.stages.reference_capture_stage as reference_capture
+
 from ..tasks import connector, display, preprocess, wire_color, wire_roi, wires
 from . import WINDOW_NAME, BaseStageConfig, Stage, UserSettingConfig
-from .initialize_stage import InitializeStage
 from .keys import (
     ACCEPTABLE_KEYS_FOR_CHECK_CAPTURE_STAGE,
     DEFAULT_WAIT_KEY_TIME,
@@ -17,9 +19,8 @@ from .keys import (
     QUIT_KEYS,
     R_KEY,
 )
-from .reference_capture_stage import ReferenceCaptureStage
 
-RESULT_SHOWN_TIME = 1000  # ms
+RESULT_SHOWN_TIME = 1250  # ms
 
 
 @dataclass
@@ -84,7 +85,7 @@ class CheckCaptureStage(Stage):
                     frame, frame_white_bg, connector_contour, self._user_config.is_connector_height_greater_than_width
                 )
 
-                cropped_wires = wires.find_wires(wire_roi_img)
+                cropped_wires = wires.find_wires(wire_roi_img, do_display_wires_thresh=True)
                 captured_color_sequence = [wire_color.find_wire_lab_color(wire) for wire in cropped_wires]
 
                 is_same_color_sequence_as_reference = wire_color.is_same_color_sequence(
@@ -107,12 +108,15 @@ class CheckCaptureStage(Stage):
         if input_key in QUIT_KEYS:
             self.quit()
 
+        # Destroy the window showing the wires threshold of found wire housing
+        cv2.destroyWindow(wires.DISPLAY_WIRES_WINDOW_NAME)
+
         if input_key == R_KEY:
-            reference_capture_stage = ReferenceCaptureStage()
+            reference_capture_stage = reference_capture.ReferenceCaptureStage()
             reference_capture_stage.run()
 
         if input_key == N_KEY:
-            initialize_stage = InitializeStage()
+            initialize_stage = initialize.InitializeStage()
             initialize_stage.run()
 
     def set_config(self, stage_config: CheckCaptureStageConfig, user_config: UserSettingConfig) -> None:

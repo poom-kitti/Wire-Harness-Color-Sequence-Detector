@@ -4,7 +4,7 @@ import numpy as np
 
 from ..utils import contour_utils
 
-MINIMUM_VALID_CONNECTOR_AREA_AFTER_ERODE = 30000
+MINIMUM_VALID_CONNECTOR_AREA_AFTER_ERODE = 3000
 
 
 def remove_wires_from_treshold(thresh_img: np.ndarray) -> np.ndarray:

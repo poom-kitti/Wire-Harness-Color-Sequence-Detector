@@ -7,6 +7,8 @@ import numpy as np
 
 from ..utils import contour_utils, frame_utils, rect_utils
 
+DISPLAY_WIRES_WINDOW_NAME = "wires"
+
 
 def get_wire_from_contour(wire_roi_img: np.ndarray, wire_contour: np.ndarray) -> np.ndarray:
     """Crop out the wire found in `wire_contour` from the `wire_roi_img`.
@@ -36,7 +38,7 @@ def get_wire_from_contour(wire_roi_img: np.ndarray, wire_contour: np.ndarray) ->
     )
 
 
-def find_wires(wire_roi_img: np.ndarray) -> List[np.ndarray]:
+def find_wires(wire_roi_img: np.ndarray, do_display_wires_thresh: bool = False) -> List[np.ndarray]:
     """Find the wires located inside the wire region of interest."""
     # Add padding to the wire region of interest, so no information will be lost if roi is rotated
     wire_roi_img = cv2.copyMakeBorder(wire_roi_img, 30, 30, 30, 30, cv2.BORDER_CONSTANT, value=(255, 255, 255))
@@ -47,14 +49,20 @@ def find_wires(wire_roi_img: np.ndarray) -> List[np.ndarray]:
 
     # Set up configuration for erosion
     kernel = np.ones((3, 3), np.uint8)
-    iterations = 3
+    iterations = 6
 
     # Perform erosion to reduce probability that wires will touch each other
     # Erosion also reduces the roi of each wire, ensuring we are inspecting the wire and not its edge
     erode_thresh = cv2.erode(wire_roi_thresh, kernel, iterations=iterations)
 
     # Filter out contours that are likely not wires
-    wires_thresh = contour_utils.filter_out_small_contours(erode_thresh, 200)
+    wires_thresh = contour_utils.filter_out_small_contours(erode_thresh, 100)
+
+    # Perform dilate to get section of wires back
+    wires_thresh = cv2.dilate(wires_thresh, kernel, iterations=int(iterations / 2))
+
+    if do_display_wires_thresh:
+        cv2.imshow(DISPLAY_WIRES_WINDOW_NAME, wires_thresh)
 
     # Find the contours
     contours, _ = cv2.findContours(wires_thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)

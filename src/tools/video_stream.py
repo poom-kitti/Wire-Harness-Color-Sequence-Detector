@@ -67,7 +67,7 @@ class PiCameraStream:
     def start(self) -> None:
         """Begin a thread to run the capture stream."""
         # Do nothing if already running
-        if self.is_running:
+        if hasattr(self, "is_running") and self.is_running:
             return
 
         self.is_running = True

@@ -81,7 +81,7 @@ class BgCaptureStage(Stage):
         if input_key in QUIT_KEYS:
             self.quit()
 
-        if input == Y_KEY:
+        if input_key == Y_KEY:
             return True
 
         return False
@@ -102,14 +102,11 @@ class BgCaptureStage(Stage):
     def run(self) -> None:
         """The main entry point of this stage."""
         # Go to next stage if does not threshold with background
-        if not self._user_config.do_threshold_with_bg:
-            self.__run_reference_capture_stage()
-
         self.__initialize()
 
         # Capture background
         captured_frame = None
-        while not self._has_chosen_bg_img:
+        while self._user_config.do_threshold_with_bg and not self._has_chosen_bg_img:
             captured_frame = self.__get_capture_frame()
             self._has_chosen_bg_img = self.__get_accept_captured_frame(captured_frame)
 
