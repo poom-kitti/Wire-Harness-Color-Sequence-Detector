@@ -13,8 +13,11 @@ from picamera.array import PiRGBArray
 
 @dataclass
 class PiCameraConfig:
-    framerate: int
+    framerate_range: Tuple
     resolution: Tuple[int, int]
+    iso: int
+    exposure_mode: str
+    awb_mode: str
 
 
 class PiCameraStream:
@@ -41,11 +44,19 @@ class PiCameraStream:
     def __set_up_camera(self, camera_config: PiCameraConfig) -> PiCamera:
         """Set up the Picamera configurations."""
         camera = PiCamera()
-        camera.framerate = camera_config.framerate
+        camera.framerate_range = camera_config.framerate_range
         camera.resolution = camera_config.resolution
+        camera.iso = camera_config.iso
 
         # Allow camera to warm up
         time.sleep(2)
+
+        # Fix the values
+        camera.shutter_speed = camera.exposure_speed
+        camera.exposure_mode = camera_config.exposure_mode
+        awb_gains = camera.awb_gains
+        camera.awb_mode = camera_config.awb_mode
+        camera.awb_gains = awb_gains
 
         return camera
 
