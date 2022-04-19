@@ -60,7 +60,7 @@ def get_text_only_frame(frame_size: Tuple[int, int], text: str) -> np.ndarray:
 
 def draw_color_sequence_result(display_img: np.ndarray, is_same_sequence: bool) -> np.ndarray:
     """Draw a rectangle on upper right corner to display whether the color sequence
-    of the wire housing is the same as the reference.
+    of the wire assy is the same as the reference.
 
     If the color sequence is the same, `OK` will be written.
     If the color sequence is different, `NG` will be written.

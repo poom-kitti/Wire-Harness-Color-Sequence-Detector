@@ -1,5 +1,5 @@
 """This module contains the class to the check stage where user can
-check the wire housing against the reference image.
+check the wire assy against the reference image.
 """
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
@@ -63,7 +63,7 @@ class CheckCaptureStage(Stage):
         return frame_threshold
 
     def __check_color_sequence(self):
-        """Get the captured wire housing color sequence against the reference."""
+        """Get the captured wire assy color sequence against the reference."""
         input_key = None
         while input_key not in ACCEPTABLE_KEYS_FOR_CHECK_CAPTURE_STAGE:
             frame = self._camera.read()
@@ -108,7 +108,7 @@ class CheckCaptureStage(Stage):
         if input_key in QUIT_KEYS:
             self.quit()
 
-        # Destroy the window showing the wires threshold of found wire housing
+        # Destroy the window showing the wires threshold of found wire assy
         cv2.destroyWindow(wires.DISPLAY_WIRES_WINDOW_NAME)
 
         if input_key == R_KEY:

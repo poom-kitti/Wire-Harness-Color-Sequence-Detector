@@ -54,6 +54,14 @@ def filter_for_largest_contour(thresh_img: np.ndarray, min_contour_area: float) 
     return black_img
 
 
+def has_contour_of_size(thresh_img: np.ndarray, area: float) -> bool:
+    """Checks if the `thresh_img` has any contour that is greater than or equal to the specified `area`."""
+    # Find the contours
+    contours, _ = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    return any((cv2.contourArea(contour) >= area for contour in contours))
+
+
 def get_contour_center_x_position(contour: np.ndarray) -> float:
     """Get the x position of the center of the given `contour`. A high value means the
     contour center is positioned more towards the right side.

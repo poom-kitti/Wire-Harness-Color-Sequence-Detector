@@ -6,7 +6,11 @@ from typing import Tuple
 import cv2
 import numpy as np
 
+from src.utils import contour_utils
+
 from ..utils import frame_utils, rect_utils
+
+ACCEPTABLE_AREA_IN_WIRE_ROI = 125
 
 
 @dataclass
@@ -35,6 +39,38 @@ def get_roi_center(
         bottom_of_connector[0],
         bottom_of_connector[1] + roi_center_distance_from_connector_btm,
     )
+
+
+def get_wire_roi(
+    frame_white_bg: np.ndarray,
+    connector_rect: Tuple,
+    rotation_angle: float,
+    wire_roi_config: WireRoiConfig,
+    wire_roi_center: Tuple[int, int],
+) -> np.ndarray:
+    """Get the wire region of interest depending on the `wire_roi_center` and `wire_roi_config`.
+    The region of interest is ideally the area directly below the wire connector.
+    """
+    # Rotate the frame to straighten the connector
+    rotated_frame = frame_utils.rotate_image(frame_white_bg, connector_rect[0], rotation_angle)
+
+    # Get wire roi
+    wire_roi = cv2.getRectSubPix(
+        rotated_frame,
+        (wire_roi_config.roi_width, wire_roi_config.roi_height),
+        wire_roi_center,
+    )
+
+    return wire_roi
+
+
+def is_valid_wire_roi(wire_roi: np.ndarray) -> bool:
+    """Checks if there is a large enough contour inside the wire region of interest."""
+    # Threshold the roi using information that the background is purely white
+    wire_roi_gray = cv2.cvtColor(wire_roi, cv2.COLOR_BGR2GRAY)
+    _, wire_roi_thresh = cv2.threshold(wire_roi_gray, 254, 255, cv2.THRESH_BINARY_INV)
+
+    return contour_utils.has_contour_of_size(wire_roi_thresh, ACCEPTABLE_AREA_IN_WIRE_ROI)
 
 
 def get_display_image(
@@ -104,28 +140,30 @@ def find_wire_roi(
         connector_rect, is_height_greater_than_width
     )
 
-    # Rotate the frame to straighten the connector
-    rotation_angle = rect_utils.get_straigten_rotation_angle(connector_rect, is_height_greater_than_width)
-    rotated_frame = frame_utils.rotate_image(frame_white_bg, connector_rect[0], rotation_angle)
-
     # Configure roi
     wire_roi_config = WireRoiConfig(
         roi_width=int(connector_width),
     )
 
-    # Find wire roi center
+    # Find target wire roi center, which is directly below connector if connector is straighten
     wire_roi_center = get_roi_center(
         connector_rect,
         connector_height,
         wire_roi_config.roi_center_distance_from_connector_btm,
     )
 
-    # Get wire roi
-    wire_roi = cv2.getRectSubPix(
-        rotated_frame,
-        (wire_roi_config.roi_width, wire_roi_config.roi_height),
-        wire_roi_center,
-    )
+    # Find rotation angle to straighten the connector in the frame
+    rotation_angle = rect_utils.get_straigten_rotation_angle(connector_rect, is_height_greater_than_width)
+
+    # Find wire roi
+    wire_roi = get_wire_roi(frame_white_bg, connector_rect, rotation_angle, wire_roi_config, wire_roi_center)
+
+    # Check if there is contour inside the found roi. If there is no contour, then the frame is rotated in
+    # the opposite direction (clockwise instead of counter-clockwise, and vice versa).
+    # NOTE: This will likely happen if the width of the connector is similar length to the height.
+    if not is_valid_wire_roi(wire_roi):
+        rotation_angle = rotation_angle - 90 if rotation_angle > 0 else rotation_angle + 90
+        wire_roi = get_wire_roi(frame_white_bg, connector_rect, rotation_angle, wire_roi_config, wire_roi_center)
 
     # Get display image
     display_img = get_display_image(ori_frame, connector_rect, wire_roi_config, wire_roi_center, rotation_angle)

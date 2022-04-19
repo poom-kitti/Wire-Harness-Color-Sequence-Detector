@@ -5,8 +5,6 @@ from typing import Tuple
 import cv2
 import numpy as np
 
-DEFAULT_MAXIUMUM_ROTATION_ANGLE = 65
-
 
 def get_straigten_rotation_angle(min_area_rect: Tuple, is_height_longer_than_width: bool) -> float:
     """Get the rotation angle to rotate the image such that the rectangle defined by
@@ -64,9 +62,9 @@ def get_straigten_rotation_angle(min_area_rect: Tuple, is_height_longer_than_wid
     # Assume rotation is not greater than maximum (handle relatively square wire connector)
     angle_to_tilt = angle
     if is_tilted_left:
-        angle_to_tilt = angle - 90 if abs(angle - 90) < DEFAULT_MAXIUMUM_ROTATION_ANGLE else angle
+        angle_to_tilt = angle - 90
     else:
-        angle_to_tilt = angle if angle < DEFAULT_MAXIUMUM_ROTATION_ANGLE else angle - 90
+        angle_to_tilt = angle
 
     return angle_to_tilt
 
