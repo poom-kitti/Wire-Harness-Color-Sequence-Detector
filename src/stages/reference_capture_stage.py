@@ -32,8 +32,8 @@ class ReferenceCaptureStage(Stage):
         self._has_reference_color_sequence = False
 
     def __create_capture_reference_display_img(self, frame: np.ndarray) -> np.ndarray:
-        """Add in title and commands telling user to insert reference wire housing."""
-        title = "Insert Reference Wire Housing"
+        """Add in title and commands telling user to insert reference wire assy."""
+        title = "Insert Reference Wire Assy"
         commands = ["[q / ESC] Quit"]
         display_img = display.draw_title_and_command(frame, title, *commands)
 
@@ -41,9 +41,9 @@ class ReferenceCaptureStage(Stage):
 
     def __create_accept_reference_display_img(self, captured_wire_housing_frame: np.ndarray) -> np.ndarray:
         """Add in title and commands promting user whether to accept the captured
-        wire housing frame.
+        wire assy frame.
         """
-        title = "Accept Captured Reference Wire Housing?"
+        title = "Accept Captured Reference Wire Assy?"
         commands = ["[Y] Yes", "[N] No", "[q / ESC] Quit"]
         display_img = display.draw_title_and_command(captured_wire_housing_frame, title, *commands)
 
@@ -71,9 +71,9 @@ class ReferenceCaptureStage(Stage):
         return frame_threshold
 
     def __get_reference_color_sequence(self) -> Tuple[List[Tuple], np.ndarray]:
-        """Get the color sequence of the reference wire housing.
+        """Get the color sequence of the reference wire assy.
 
-        User will be prompted to inser the wire housing.
+        User will be prompted to inser the wire assy.
         """
         while True:
             frame = self._camera.read()
@@ -114,7 +114,7 @@ class ReferenceCaptureStage(Stage):
         return reference_color_sequence, display_frame
 
     def __get_accept_reference_color_sequence(self, captured_wire_housing_frame: np.ndarray) -> bool:
-        """Get whether the user accepts the captured reference wire housing."""
+        """Get whether the user accepts the captured reference wire assy."""
         display_img = self.__create_accept_reference_display_img(captured_wire_housing_frame)
 
         input_key = None
@@ -132,7 +132,7 @@ class ReferenceCaptureStage(Stage):
 
     def __run_check_capture_stage(self, reference_color_sequence: List[Tuple]) -> None:
         """Run the next stage, which is background capture stage."""
-        # Destroy the window showing the wires threshold of found wire housing
+        # Destroy the window showing the wires threshold of found wire assy
         cv2.destroyWindow(wires.DISPLAY_WIRES_WINDOW_NAME)
 
         check_capture_stage = CheckCaptureStage()
@@ -150,7 +150,7 @@ class ReferenceCaptureStage(Stage):
     def run(self):
         self.__initialize()
 
-        # Capture wire housing reference color sequence
+        # Capture wire assy reference color sequence
         reference_color_sequence = None
         while not self._has_reference_color_sequence:
             reference_color_sequence, captured_wire_housing_frame = self.__get_reference_color_sequence()
