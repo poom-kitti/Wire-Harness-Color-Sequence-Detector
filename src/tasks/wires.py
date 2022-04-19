@@ -8,6 +8,7 @@ import numpy as np
 from ..utils import contour_utils, frame_utils, rect_utils
 
 DISPLAY_WIRES_WINDOW_NAME = "wires"
+MINIMUM_VALID_WIRE_CONTOUR_AFTER_ERODE = 100
 
 
 def get_wire_from_contour(wire_roi_img: np.ndarray, wire_contour: np.ndarray) -> np.ndarray:
@@ -56,7 +57,7 @@ def find_wires(wire_roi_img: np.ndarray, do_display_wires_thresh: bool = False) 
     erode_thresh = cv2.erode(wire_roi_thresh, kernel, iterations=iterations)
 
     # Filter out contours that are likely not wires
-    wires_thresh = contour_utils.filter_out_small_contours(erode_thresh, 100)
+    wires_thresh = contour_utils.filter_out_small_contours(erode_thresh, MINIMUM_VALID_WIRE_CONTOUR_AFTER_ERODE)
 
     # Perform dilate to get section of wires back
     wires_thresh = cv2.dilate(wires_thresh, kernel, iterations=int(iterations / 2))

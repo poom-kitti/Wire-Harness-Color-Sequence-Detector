@@ -10,7 +10,7 @@ from src.utils import contour_utils
 
 from ..utils import frame_utils, rect_utils
 
-ACCEPTABLE_AREA_IN_WIRE_ROI = 125
+ACCEPTABLE_MINIMUM_AREA_IN_WIRE_ROI = 500
 
 
 @dataclass
@@ -70,7 +70,7 @@ def is_valid_wire_roi(wire_roi: np.ndarray) -> bool:
     wire_roi_gray = cv2.cvtColor(wire_roi, cv2.COLOR_BGR2GRAY)
     _, wire_roi_thresh = cv2.threshold(wire_roi_gray, 254, 255, cv2.THRESH_BINARY_INV)
 
-    return contour_utils.has_contour_of_size(wire_roi_thresh, ACCEPTABLE_AREA_IN_WIRE_ROI)
+    return contour_utils.has_contour_of_size(wire_roi_thresh, ACCEPTABLE_MINIMUM_AREA_IN_WIRE_ROI)
 
 
 def get_display_image(
