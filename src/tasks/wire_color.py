@@ -6,6 +6,9 @@ import numpy as np
 from colormath import color_diff
 from colormath.color_objects import LabColor
 
+# LAB representation of white color
+WHITE_LAB_COLOR = cv2.cvtColor(np.full((1, 1, 3), 255, dtype=np.uint8), cv2.COLOR_BGR2LAB)[0, 0, :]
+
 DEFAULT_ACCEPTABLE_DELTA_E_THRESHOLD = 4  # Default threshold to consider two colors equal
 
 
@@ -15,8 +18,14 @@ def find_wire_lab_color(wire_img: np.ndarray) -> Tuple[float, float, float]:
     The representative LAB value is the median of the mean LAB values of the bins,
     where a bin is taken as one pixel column in the `wire_img`.
     """
-    # Convert the wire image to hsv color space
+    # Convert the wire image to LAB color space
     wire_lab: np.ndarray = cv2.cvtColor(wire_img, cv2.COLOR_BGR2LAB)
+
+    # Change wire image value type to float to be able to use NaN
+    wire_lab = wire_lab.astype(np.float16)
+
+    # Fill in the background color (complete white) as NaN value
+    wire_lab[wire_lab == WHITE_LAB_COLOR] = np.nan
 
     # Initiate lists to store the mean hsv values of all the bins
     l_bin_vals = []
@@ -26,9 +35,9 @@ def find_wire_lab_color(wire_img: np.ndarray) -> Tuple[float, float, float]:
     # Iterate through each bin (1 px column) in the wire image
     for bin in range(wire_lab.shape[1]):
         # Find the average hsv value of the bin
-        bin_avg_l_val = np.mean(wire_lab[bin, :, 0])
-        bin_avg_a_val = np.mean(wire_lab[bin, :, 1])
-        bin_avg_b_val = np.mean(wire_lab[bin, :, 2])
+        bin_avg_l_val = np.nanmean(wire_lab[:, bin, 0])
+        bin_avg_a_val = np.nanmean(wire_lab[:, bin, 1])
+        bin_avg_b_val = np.nanmean(wire_lab[:, bin, 2])
 
         # Add the hsv value to the bin values lists
         l_bin_vals.append(bin_avg_l_val)
@@ -36,9 +45,9 @@ def find_wire_lab_color(wire_img: np.ndarray) -> Tuple[float, float, float]:
         b_bin_vals.append(bin_avg_b_val)
 
     # Calculate the median of the mean hsv values to get representative hsv value
-    representative_l_val = np.median(l_bin_vals)
-    representative_a_val = np.median(a_bin_vals)
-    representative_b_val = np.median(b_bin_vals)
+    representative_l_val = np.nanmedian(l_bin_vals)
+    representative_a_val = np.nanmedian(a_bin_vals)
+    representative_b_val = np.nanmedian(b_bin_vals)
 
     return representative_l_val, representative_a_val, representative_b_val
 
