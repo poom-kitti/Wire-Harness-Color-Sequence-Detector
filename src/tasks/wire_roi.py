@@ -1,6 +1,5 @@
 """This module contains functions to find the region of interest where the wires
 should be. The ROI is taken as an area beneath the wire connector."""
-from dataclasses import dataclass
 from typing import Tuple
 
 import cv2
@@ -10,14 +9,10 @@ from src.utils import contour_utils
 
 from ..utils import frame_utils, rect_utils
 
+WIRE_ROI_CENTER_FROM_CONNECTOR_BTM = 15  # px
+WIRE_ROI_HEIGHT = 28
+
 ACCEPTABLE_MINIMUM_AREA_IN_WIRE_ROI = 500
-
-
-@dataclass
-class WireRoiConfig:
-    roi_width: int
-    roi_height: int = 28
-    roi_center_distance_from_connector_btm: int = 15
 
 
 def get_roi_center(
@@ -44,20 +39,27 @@ def get_roi_center(
 def get_wire_roi(
     frame_white_bg: np.ndarray,
     connector_rect: Tuple,
+    connector_width: float,
+    connector_height: float,
     rotation_angle: float,
-    wire_roi_config: WireRoiConfig,
-    wire_roi_center: Tuple[int, int],
 ) -> np.ndarray:
     """Get the wire region of interest depending on the `wire_roi_center` and `wire_roi_config`.
     The region of interest is ideally the area directly below the wire connector.
     """
+    # Find target wire roi center, which is directly below connector if connector is straighten
+    wire_roi_center = get_roi_center(
+        connector_rect,
+        connector_height,
+        WIRE_ROI_CENTER_FROM_CONNECTOR_BTM,
+    )
+
     # Rotate the frame to straighten the connector
     rotated_frame = frame_utils.rotate_image(frame_white_bg, connector_rect[0], rotation_angle)
 
     # Get wire roi
     wire_roi = cv2.getRectSubPix(
         rotated_frame,
-        (wire_roi_config.roi_width, wire_roi_config.roi_height),
+        (int(connector_width), WIRE_ROI_HEIGHT),
         wire_roi_center,
     )
 
@@ -76,12 +78,19 @@ def is_valid_wire_roi(wire_roi: np.ndarray) -> bool:
 def get_display_image(
     original_frame: np.ndarray,
     connector_rect: Tuple,
-    wire_roi_config: WireRoiConfig,
-    wire_roi_center: Tuple[int, int],
+    connector_width: float,
+    connector_height: float,
     rotation_angle: float,
 ) -> np.ndarray:
     """Get the image to display for the user highlighting the rectangles
     surrounding the wire connector and wire region of interest."""
+    # Find target wire roi center, which is directly below connector if connector is straighten
+    wire_roi_center = get_roi_center(
+        connector_rect,
+        connector_height,
+        WIRE_ROI_CENTER_FROM_CONNECTOR_BTM,
+    )
+
     # Create a mask of where the rectangles should be drawn
     # The white section of the mask will be filled with color
     mask = np.zeros(original_frame.shape[:2], np.uint8)
@@ -99,7 +108,7 @@ def get_display_image(
     # Get the corners of the wire roi rectangle
     wire_roi_rect = (
         wire_roi_center,
-        (wire_roi_config.roi_width, wire_roi_config.roi_height),
+        (connector_width, WIRE_ROI_HEIGHT),
         0,
     )
     wire_roi_box: np.ndarray = cv2.boxPoints(wire_roi_rect)
@@ -140,32 +149,23 @@ def find_wire_roi(
         connector_rect, is_height_greater_than_width
     )
 
-    # Configure roi
-    wire_roi_config = WireRoiConfig(
-        roi_width=int(connector_width),
-    )
-
-    # Find target wire roi center, which is directly below connector if connector is straighten
-    wire_roi_center = get_roi_center(
-        connector_rect,
-        connector_height,
-        wire_roi_config.roi_center_distance_from_connector_btm,
-    )
-
     # Find rotation angle to straighten the connector in the frame
     rotation_angle = rect_utils.get_straigten_rotation_angle(connector_rect, is_height_greater_than_width)
 
     # Find wire roi
-    wire_roi = get_wire_roi(frame_white_bg, connector_rect, rotation_angle, wire_roi_config, wire_roi_center)
+    wire_roi = get_wire_roi(frame_white_bg, connector_rect, connector_width, connector_height, rotation_angle)
 
     # Check if there is contour inside the found roi. If there is no contour, then the frame is rotated in
     # the opposite direction (clockwise instead of counter-clockwise, and vice versa).
     # NOTE: This will likely happen if the width of the connector is similar length to the height.
     if not is_valid_wire_roi(wire_roi):
         rotation_angle = rotation_angle - 90 if rotation_angle > 0 else rotation_angle + 90
-        wire_roi = get_wire_roi(frame_white_bg, connector_rect, rotation_angle, wire_roi_config, wire_roi_center)
+
+        # Since frame rotate in opposite direction due to wrong input of height greater than width, swap them
+        connector_width, connector_height = connector_height, connector_width
+        wire_roi = get_wire_roi(frame_white_bg, connector_rect, connector_width, connector_height, rotation_angle)
 
     # Get display image
-    display_img = get_display_image(ori_frame, connector_rect, wire_roi_config, wire_roi_center, rotation_angle)
+    display_img = get_display_image(ori_frame, connector_rect, connector_width, connector_height, rotation_angle)
 
     return wire_roi, display_img
