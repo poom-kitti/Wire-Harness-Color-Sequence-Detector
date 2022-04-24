@@ -44,7 +44,7 @@ class ReferenceCaptureStage(Stage):
         wire assy frame.
         """
         title = "Accept Captured Reference Wire Assy?"
-        commands = ["[Y] Yes", "[N] No", "[q / ESC] Quit"]
+        commands = ["[y] Yes", "[n] No", "[q / ESC] Quit"]
         display_img = display.draw_title_and_command(captured_wire_housing_frame, title, *commands)
 
         return display_img

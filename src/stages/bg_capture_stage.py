@@ -44,7 +44,7 @@ class BgCaptureStage(Stage):
         background image.
         """
         title = "Accept Captured Background Image?"
-        commands = ["[Y] Yes", "[N] No", "[q / ESC] Quit"]
+        commands = ["[y] Yes", "[n] No", "[q / ESC] Quit"]
         display_img = display.draw_title_and_command(capture_bg_frame, title, *commands)
 
         return display_img
