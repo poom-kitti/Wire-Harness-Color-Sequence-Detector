@@ -5,7 +5,7 @@ from typing import List
 import cv2
 import numpy as np
 
-from ..utils import frame_utils, rect_utils
+from ..utils import contour_utils, frame_utils, rect_utils
 
 DISPLAY_WIRES_WINDOW_NAME = "wires"
 MINIMUM_VALID_WIRE_CONTOUR_AFTER_ERODE = 100
@@ -120,5 +120,7 @@ def find_wires(wire_roi_img: np.ndarray, do_display_wires_thresh: bool = False) 
     # Perform display if needed
     if do_display_wires_thresh:
         cv2.imshow(DISPLAY_WIRES_WINDOW_NAME, display_wire_thresh)
+
+    wire_contours = contour_utils.sort_contours_by_axis(wire_contours, True)
 
     return [get_wire_from_contour(wire_roi_img, contour) for contour in wire_contours]
