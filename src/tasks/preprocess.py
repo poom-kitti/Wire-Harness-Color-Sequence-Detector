@@ -15,7 +15,7 @@ MINIMUM_VALID_CONTOUR_AREA = 2000  # Minimum area to be considered a contour of 
 DISREGARD_WIDTH_PERCENTAGE = 0.3
 DISREGARD_HEIGHT_PERCENTAGE = 0.5
 # Minimum area of contour to consider as possible candidate for wire connector
-MINIMUM_VALID_CONNECTOR_AREA = 20000
+MINIMUM_VALID_CONNECTOR_AREA = 10000
 
 
 @dataclass

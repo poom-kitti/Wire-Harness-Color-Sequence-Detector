@@ -9,7 +9,7 @@ from colormath.color_objects import LabColor
 # LAB representation of white color
 WHITE_LAB_COLOR = cv2.cvtColor(np.full((1, 1, 3), 255, dtype=np.uint8), cv2.COLOR_BGR2LAB)[0, 0, :]
 
-DEFAULT_ACCEPTABLE_DELTA_E_THRESHOLD = 4  # Default threshold to consider two colors equal
+DEFAULT_ACCEPTABLE_DELTA_E_THRESHOLD = 5  # Default threshold to consider two colors equal
 
 
 def find_wire_lab_color(wire_img: np.ndarray) -> Tuple[float, float, float]:

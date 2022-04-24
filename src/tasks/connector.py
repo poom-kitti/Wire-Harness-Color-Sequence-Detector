@@ -4,6 +4,9 @@ import numpy as np
 
 from ..utils import contour_utils
 
+# Number of iterations to perform erosion that wil be enough to separate the section
+# where wires intersect connector.
+EROSION_ITERATIONS = 8
 MINIMUM_VALID_CONNECTOR_AREA_AFTER_ERODE = 3000
 
 
@@ -19,16 +22,15 @@ def remove_wires_from_treshold(thresh_img: np.ndarray) -> np.ndarray:
     """
     # Set the kernel and iterations for morphological transformations
     kernel = np.ones((5, 5), np.uint8)
-    iterations = 10  # Should be enough to erode the section where wires intersect connector
 
     # Erode the thresh_img
-    erode_thresh = cv2.erode(thresh_img, kernel, iterations=iterations)
+    erode_thresh = cv2.erode(thresh_img, kernel, iterations=EROSION_ITERATIONS)
 
     # Filter for only wire connector (assume is largest contour)
     connector_thresh = contour_utils.filter_for_largest_contour(erode_thresh, MINIMUM_VALID_CONNECTOR_AREA_AFTER_ERODE)
 
     # Dilate back to get connector shape
-    return cv2.dilate(connector_thresh, kernel, iterations=iterations)
+    return cv2.dilate(connector_thresh, kernel, iterations=EROSION_ITERATIONS)
 
 
 def fill_wire_connector_holes(thresh_img: np.ndarray) -> np.ndarray:
