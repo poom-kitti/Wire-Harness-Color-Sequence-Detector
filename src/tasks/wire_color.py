@@ -1,4 +1,4 @@
-"""This module contains functions to find the wire HSV color."""
+"""This module contains functions to find the wire LAB color."""
 from typing import List, Tuple
 
 import cv2
@@ -27,24 +27,24 @@ def find_wire_lab_color(wire_img: np.ndarray) -> Tuple[float, float, float]:
     # Fill in the background color (complete white) as NaN value
     wire_lab[wire_lab == WHITE_LAB_COLOR] = np.nan
 
-    # Initiate lists to store the mean hsv values of all the bins
+    # Initiate lists to store the mean LAB values of all the bins
     l_bin_vals = []
     a_bin_vals = []
     b_bin_vals = []
 
     # Iterate through each bin (1 px column) in the wire image
     for bin in range(wire_lab.shape[1]):
-        # Find the average hsv value of the bin
+        # Find the average LAB value of the bin
         bin_avg_l_val = np.nanmean(wire_lab[:, bin, 0])
         bin_avg_a_val = np.nanmean(wire_lab[:, bin, 1])
         bin_avg_b_val = np.nanmean(wire_lab[:, bin, 2])
 
-        # Add the hsv value to the bin values lists
+        # Add the LAB value to the bin values lists
         l_bin_vals.append(bin_avg_l_val)
         a_bin_vals.append(bin_avg_a_val)
         b_bin_vals.append(bin_avg_b_val)
 
-    # Calculate the median of the mean hsv values to get representative hsv value
+    # Calculate the median of the mean LAB values to get representative LAB value
     representative_l_val = np.nanmedian(l_bin_vals)
     representative_a_val = np.nanmedian(a_bin_vals)
     representative_b_val = np.nanmedian(b_bin_vals)
